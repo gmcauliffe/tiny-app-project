@@ -6,9 +6,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gmcauliffe/tiny-app-project.git"
+  },
   "author": "Guy McAuliffe",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gmcauliffe/tiny-app-project/issues"
+  },
+  "homepage": "https://github.com/gmcauliffe/tiny-app-project#readme",
   "dependencies": {
+    "ejs": "^2.6.1",
     "express": "^4.16.3"
   }
 }
