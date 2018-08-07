@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <h2>URLS</h2>
+        <ul>
+
+          <% Object.keys(urls).forEach(function(shortURL) { %>
+
+            <li><%= shortURL %> --- <%= urls[shortURL] %></li>
+
+          <% }); %>
+
+
+        </ul>
+</body>
+</html>
