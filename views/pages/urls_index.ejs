@@ -1,0 +1,27 @@
+<!-- views/pages/url_index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <% include ../partials/_head %>
+</head>
+<body>
+
+<header>
+  <% include ../partials/_header %>
+</header>
+
+<main>
+  <h2>URLS</h2>
+    <ul>
+
+      <% Object.keys(urls).forEach(function(shortURL) { %>
+
+      <li><%= shortURL %> --- <%= urls[shortURL] %></li>
+
+      <% }); %>
+    </ul>
+</main>
+
+</body>
+</html>

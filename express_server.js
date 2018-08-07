@@ -28,7 +28,7 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase};
-  res.render("urls_index", templateVars);
+  res.render("pages/urls_index", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -36,7 +36,7 @@ app.get("/urls/:id", (req, res) => {
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id]
   };
-  res.render("urls_show", templateVars);
+  res.render("pages/urls_show", templateVars);
 });
 
 
