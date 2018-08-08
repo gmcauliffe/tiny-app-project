@@ -1,10 +1,17 @@
 <!-- views/partials/_header.ejs -->
-<div style="margin:10px;">
+<div style="margin:20px;">
+<% if (!username) { %>
   <form action="/login" method="POST">
-    <label for="username">Login:</label>
+    <label for="username">Enter:</label>
     <input id="username" type="text" name="username" placeholder="username">
-    <input type="submit" value="Submit">
+    <button type="submit">Login</button>
   </form>
+<% } else { %>
+  <form action="/logout" method="POST">
+    <label for="username"> <%= username %> </label>
+    <button type="submit">Logout</button>
+  </form>
+<% } %>
 </div>
 <nav class="navbar navbar-default" role="navigation">
 <div class="container-fluid">

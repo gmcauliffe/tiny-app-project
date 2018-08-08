@@ -5,6 +5,9 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
 app.set('view engine', 'ejs'); // set the view engine to ejs
 
 const urlDatabase = {
@@ -22,15 +25,22 @@ function generateRandomString() {
   return text;
 }
 
+// Cookie/Username
 
 // index page
 app.get('/', function(req, res) {
-    res.render('pages/index');    // use res.render to load up an ejs view file
+  let templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render('pages/index', templateVars);    // use res.render to load up an ejs view file
 });
 
 // about page
 app.get('/about', function(req, res) {
-    res.render('pages/about');
+  let templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render('pages/about', templateVars);
 });
 
 // URLS JSON Page
@@ -40,13 +50,18 @@ app.get("/urls.json", (req, res) => {
 
 // URLS index page
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase};
+  let templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase};
   res.render("pages/urls_index", templateVars);
 });
 
 // new URL page
 app.get("/urls/new", (req, res) => {
-  res.render("pages/urls_new");
+  let templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("pages/urls_new", templateVars);
 });
 
 // single URL Id page
@@ -54,11 +69,13 @@ app.get("/urls/:id", (req, res) => {
   let input = req.params.id
   if (!urlDatabase.hasOwnProperty(input)) {
     let templateVars = {
+      username: req.cookies["username"],
       status: 404
     };
     res.render("pages/error-page", templateVars)
   } else {
     let templateVars = {
+      username: req.cookies["username"],
       URLId: input,
       longURL: urlDatabase[req.params.id]
     };
@@ -98,7 +115,13 @@ app.post("/login", (req, res) => {
   res.redirect(`http://localhost:8080/urls`);
 });
 
+// Username Logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect(`http://localhost:8080/urls`);
+});
+
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });
