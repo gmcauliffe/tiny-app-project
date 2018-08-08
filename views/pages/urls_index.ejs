@@ -7,25 +7,25 @@
 </head>
 <body>
 
-<header>
-  <% include ../partials/_header %>
-</header>
+  <header>
+    <% include ../partials/_header %>
+  </header>
 
-<main>
-  <h2>URLS</h2>
+  <main>
+    <h2>URLS</h2>
     <ul>
 
       <% Object.keys(urls).forEach(function(URLId) { %>
 
       <li><%= URLId %> --- <%= urls[URLId] %>
         <form method="POST" action=<%= `/urls/${URLId}/delete` %>>
-          <button type="submit">Delete</button>
+        <button type="submit">Delete</button>
         </form>
       </li>
 
       <% }); %>
     </ul>
-</main>
+  </main>
 
 </body>
 </html>
