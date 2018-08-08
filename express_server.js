@@ -33,6 +33,7 @@ app.get('/about', function(req, res) {
     res.render('pages/about');
 });
 
+// URLS JSON Page
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -57,12 +58,18 @@ app.get("/urls/:id", (req, res) => {
   res.render("pages/urls_show", templateVars);
 });
 
+// Redirection
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+
 // POST route
 app.post("/urls", (req, res) => {
   let URLId = generateRandomString();
   let URL = req.body.longURL;
-  urlDatabase[URLId][URL];
-  res.redirect(`http://localhost:8080/urls/${URLId}`);         // Respond with 'Ok' (we will replace this)
+  urlDatabase[URLId] = URL;
+  res.redirect(`http://localhost:8080/urls/${URLId}`);
 });
 
 
