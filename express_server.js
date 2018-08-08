@@ -72,11 +72,18 @@ app.post("/urls", (req, res) => {
   res.redirect(`http://localhost:8080/urls/${URLId}`);
 });
 
+// Update LongURL
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.updateURL;
+  res.redirect(`http://localhost:8080/urls`);
+});
+
 // Delete URLId
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect(`http://localhost:8080/urls`);
 });
+
 
 
 app.listen(PORT, () => {

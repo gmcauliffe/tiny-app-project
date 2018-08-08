@@ -18,9 +18,9 @@
 
   <h4>Your current details:  <%= URLId %> --- <%= longURL %></h4>
 
-  <form action="/urls" method="POST" style="margin:25px;">
-    <label for="longURL">Update your full URL here:</label>
-    <input id="longURL" type="text" name="longURL" placeholder="e.g. http://yourUpdatedURL" style="width: 300px;">
+  <form action=<%= `/urls/${URLId}` %> method="POST" style="margin:25px;">
+    <label for="updateURL">Update your full URL here:</label>
+    <input id="updateURL" type="text" name="updateURL" placeholder="e.g. http://yourUpdatedURL" style="width: 300px;">
     <input type="submit" value="Update">
   </form>
 </main>
