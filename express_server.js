@@ -51,11 +51,19 @@ app.get("/urls/new", (req, res) => {
 
 // single URL Id page
 app.get("/urls/:id", (req, res) => {
-  let templateVars = {
-    URLId: req.params.id,
-    longURL: urlDatabase[req.params.id]
-  };
-  res.render("pages/urls_show", templateVars);
+  let input = req.params.id
+  if (!urlDatabase.hasOwnProperty(input)) {
+    let templateVars = {
+      status: 404
+    };
+    res.render("pages/error-page", templateVars)
+  } else {
+    let templateVars = {
+      URLId: input,
+      longURL: urlDatabase[req.params.id]
+    };
+    res.render("pages/urls_show", templateVars);
+  }
 });
 
 // Redirection

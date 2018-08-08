@@ -11,15 +11,16 @@
     <% include ../partials/_header %>
   </header>
 
-  <main>
-    <h2>URLS</h2>
-    <ul>
+  <main style="font-size:20px; padding:75px;">
+    <h1>URLS</h1>
+    <ul style="margin:50px;">
 
       <% Object.keys(urls).forEach(function(URLId) { %>
 
-      <li><%= URLId %> --- <%= urls[URLId] %>
+      <li>
         <form method="POST" action=<%= `/urls/${URLId}/delete` %>>
-        <button type="submit">Delete</button>
+          <label for="URLDetails"><%= URLId %>  -->  <%= urls[URLId] %>  <a href=<%= `/urls/${URLId}` %>>Edit</a></label>
+          <button type="submit">Delete 🗑 </button>
         </form>
       </li>
 
