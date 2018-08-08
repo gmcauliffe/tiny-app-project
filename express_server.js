@@ -64,7 +64,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-// POST route
+// Create new URLId and add to database
 app.post("/urls", (req, res) => {
   let URLId = generateRandomString();
   let URL = req.body.longURL;
@@ -72,6 +72,11 @@ app.post("/urls", (req, res) => {
   res.redirect(`http://localhost:8080/urls/${URLId}`);
 });
 
+// Delete URLId
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect(`http://localhost:8080/urls`);
+});
 
 
 app.listen(PORT, () => {
