@@ -1,5 +1,11 @@
 <!-- views/partials/_header.ejs -->
-
+<div style="margin:10px;">
+  <form action="/login" method="POST">
+    <label for="username">Login:</label>
+    <input id="username" type="text" name="username" placeholder="username">
+    <input type="submit" value="Submit">
+  </form>
+</div>
 <nav class="navbar navbar-default" role="navigation">
 <div class="container-fluid">
 
@@ -14,6 +20,9 @@
             <li><a href="/about">About</a></li>
             <li><a href="/urls">URLS Index</a></li>
             <li><a href="/urls/new">Get a TinyURL</a></li>
+            <li>
+
+            </li>
         </ul>
     </div>
 

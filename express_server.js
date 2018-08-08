@@ -92,6 +92,11 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect(`http://localhost:8080/urls`);
 });
 
+// Username Login
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect(`http://localhost:8080/urls`);
+});
 
 
 app.listen(PORT, () => {

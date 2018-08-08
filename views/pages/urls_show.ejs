@@ -7,22 +7,25 @@
 </head>
 <body>
 
-<header>
-  <% include ../partials/_header %>
-</header>
+  <header>
+    <% include ../partials/_header %>
+  </header>
 
-<h2 style="margin:50px;">Your TinyURL Management Page</h2>
+  <h2 style="margin:50px;">Your TinyURL Management Page</h2>
 
-<main style="margin:150px;">
+  <main style="margin:150px;">
 
 
-  <h4>Your current details:  <%= URLId %> --- <%= longURL %></h4>
+    <h4>Your current details:  <%= URLId %> --- <%= longURL %></h4>
 
-  <form action=<%= `/urls/${URLId}` %> method="POST" style="margin:25px;">
-    <label for="updateURL">Update your full URL here:</label>
-    <input id="updateURL" type="text" name="updateURL" placeholder="e.g. http://yourUpdatedURL" style="width: 300px;">
-    <input type="submit" value="Update">
-  </form>
-</main>
+    <form action=<%= `/urls/${URLId}` %> method="POST" style="margin:25px;">
+      <label for="updateURL">Update your full URL here:</label>
+      <input id="updateURL" type="text" name="updateURL" placeholder="e.g. http://yourUpdatedURL" style="width: 300px;">
+      <input type="submit" value="Update">
+    </form>
+  </main>
+  <footer>
+    <% include ../partials/_footer %>
+  </footer>
 </body>
 </html>
