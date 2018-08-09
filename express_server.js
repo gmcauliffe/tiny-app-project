@@ -148,7 +148,6 @@ app.post("/login", (req, res) => {
     if (email === userDatabase[ids].email && password === userDatabase[ids].password) {
       grantAccess = true;
       currentUser = userDatabase[ids]['id'];
-      console.log(grantAccess);
     }
   };
 
