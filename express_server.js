@@ -37,7 +37,6 @@ function generateRandomString() {
   return text;
 }
 
-// Cookie/Username
 
 // index page
 app.get('/', function(req, res) {
@@ -157,15 +156,7 @@ app.post("/register", (req, res) => {
     }
   }
 
-  if (exists) {
-    let templateVars = {
-      username: req.cookies["username"],
-      status: 404,
-      message: "Email already registered. Try again."
-    };
-    res.render("pages/error-page", templateVars);
-
-  } else if (!req.body.email || !req.body.password) {
+  if (exists || !req.body.email || !req.body.password) {
     let templateVars = {
       username: req.cookies["username"],
       status: 404,
