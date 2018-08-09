@@ -145,10 +145,15 @@ app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   let grantAccess = false;
-        console.log(grantAccess);
-  for (var i = 0; i < userDatabase.length; i++) {
-    if (email === userDatabase[i].email && password === userDatabase[i].password) {
+  let currentUser = "";
+  // console.log(email);
+  // console.log(password);
+  for (var ids in userDatabase) {
+    console.log(userDatabase[ids].email);
+    console.log(userDatabase[ids].password);
+    if (email === userDatabase[ids].email && password === userDatabase[ids].password) {
       grantAccess = true;
+      currentUser = userDatabase[ids]['id'];
       console.log(grantAccess);
     }
   };
