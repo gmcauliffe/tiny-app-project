@@ -1,10 +1,13 @@
 <!-- views/partials/_header.ejs -->
 <div style="margin:20px;">
 <% if (!username) { %>
-  <form action="/login" method="POST">
-    <label for="username">Enter:</label>
-    <input id="username" type="text" name="username" placeholder="username">
+  <form action="/login" method="POST" style="display:inline;">
+    <label for="username">Email Address:</label>
+    <input id="username" type="text" name="username" placeholder="e.g. smith@example.com" style="width: 200px;">
     <button type="submit">Login</button>
+  </form>
+  <form action="/register" method="GET" style="display:inline;">
+    <button type="submit">Register</button>
   </form>
 <% } else { %>
   <form action="/logout" method="POST">
@@ -17,9 +20,9 @@
 <div class="container-fluid">
 
     <div class="navbar-header">
-        <a class="navbar-brand" href="#">
-            <span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
-            Guy's Tiny App
+        <a class="navbar-brand" href="/">
+            <span class="glyphicon glyphicon-road"></span>
+            Guy's TinyApp
         </a>
 
         <ul class="nav navbar-nav">

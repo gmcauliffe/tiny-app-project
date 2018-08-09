@@ -83,11 +83,22 @@ app.get("/urls/:id", (req, res) => {
   }
 });
 
+// Register
+app.get("/register", (req, res) => {
+  let templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("pages/registration", templateVars);
+});
+
+
 // Redirection
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
+
+
 
 // Create new URLId and add to database
 app.post("/urls", (req, res) => {
