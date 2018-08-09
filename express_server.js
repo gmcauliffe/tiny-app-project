@@ -77,11 +77,14 @@ app.get("/urls", (req, res) => {
 
 // new URL page
 app.get("/urls/new", (req, res) => {
-//  if if (!userDetails) {
-  let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
+  if (!userDatabase[req.cookies["user_id"]]) {
+    errorPage(req, res, 404, "Forbidden Access!");
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.cookies["user_id"]],
+    };
+    res.render("pages/urls_new", templateVars);
   };
-  res.render("pages/urls_new", templateVars);
 });
 
 // Login page
@@ -156,7 +159,6 @@ app.post("/login", (req, res) => {
       currentUser = userDatabase[ids]['id'];
     }
   };
-
   if (grantAccess) {
     res.cookie('user_id', currentUser);
     res.redirect(`http://localhost:8080/urls`);
