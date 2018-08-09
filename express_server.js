@@ -118,8 +118,6 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-
-
 // Create new URLId and add to database
 app.post("/urls", (req, res) => {
   let URLId = generateRandomString();
@@ -146,11 +144,7 @@ app.post("/login", (req, res) => {
   let password = req.body.password;
   let grantAccess = false;
   let currentUser = "";
-  // console.log(email);
-  // console.log(password);
   for (var ids in userDatabase) {
-    console.log(userDatabase[ids].email);
-    console.log(userDatabase[ids].password);
     if (email === userDatabase[ids].email && password === userDatabase[ids].password) {
       grantAccess = true;
       currentUser = userDatabase[ids]['id'];
