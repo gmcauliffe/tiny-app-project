@@ -82,7 +82,8 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase.hasOwnProperty(input)) {
     let templateVars = {
       username: req.cookies["username"],
-      status: 404
+      status: 404,
+      message: "That TinyURL does not exist."
     };
     res.render("pages/error-page", templateVars)
   } else {
@@ -146,15 +147,41 @@ app.post("/logout", (req, res) => {
 
 // Register
 app.post("/register", (req, res) => {
-  var userId = generateRandomString();
-  userDatabase[userId] = {
+  let password = req.body.password;
+  let email = req.body.email;
+  let exists = false;
+
+  for (var userIds in userDatabase) {
+    if (email === userDatabase[userIds].email) {
+      exists = true;
+    }
+  }
+
+  if (exists) {
+    let templateVars = {
+      username: req.cookies["username"],
+      status: 404,
+      message: "Email already registered. Try again."
+    };
+    res.render("pages/error-page", templateVars);
+
+  } else if (!req.body.email || !req.body.password) {
+    let templateVars = {
+      username: req.cookies["username"],
+      status: 404,
+      message: "Make sure you enter a valid email and password. Please try again."
+    };
+    res.render("pages/error-page", templateVars);
+  } else {
+    var userId = generateRandomString();
+    userDatabase[userId] = {
       id: userId,
       email: req.body.email,
       password: req.body.password
     };
-  res.cookie('user_id', userId);
-  console.log(userDatabase);
-  res.redirect(`http://localhost:8080/urls`);
+    res.cookie('user_id', userId);
+    res.redirect(`http://localhost:8080/urls`);
+  };
 });
 
 
