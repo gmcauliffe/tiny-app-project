@@ -1,6 +1,6 @@
 <!-- views/partials/_header.ejs -->
 <div style="margin: 20px;">
-<% if (!username) { %>
+<% if (!userDetails) { %>
   <form action="/login" method="POST" style="display:inline;">
     <label for="username">Email Address:</label>
     <input id="username" type="text" name="username" placeholder="e.g. smith@example.com" style="width: 200px;">
@@ -11,7 +11,7 @@
   </form>
 <% } else { %>
   <form action="/logout" method="POST">
-    <label for="username"> <%= username %> </label>
+    <label for="username"> <%= userDetails.email %> </label>
     <button type="submit">Logout</button>
   </form>
 <% } %>

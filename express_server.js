@@ -41,7 +41,7 @@ function generateRandomString() {
 // index page
 app.get('/', function(req, res) {
   let templateVars = {
-    username: req.cookies["username"]
+    userDetails: userDatabase[req.cookies["user_id"]],
   };
   res.render('pages/index', templateVars);    // use res.render to load up an ejs view file
 });
@@ -49,7 +49,7 @@ app.get('/', function(req, res) {
 // about page
 app.get('/about', function(req, res) {
   let templateVars = {
-    username: req.cookies["username"]
+    userDetails: userDatabase[req.cookies["user_id"]],
   };
   res.render('pages/about', templateVars);
 });
@@ -62,7 +62,7 @@ app.get("/urls.json", (req, res) => {
 // URLS index page
 app.get("/urls", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
+    userDetails: userDatabase[req.cookies["user_id"]],
     urls: urlDatabase};
   res.render("pages/urls_index", templateVars);
 });
@@ -70,7 +70,7 @@ app.get("/urls", (req, res) => {
 // new URL page
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    userDetails: userDatabase[req.cookies["user_id"]],
   };
   res.render("pages/urls_new", templateVars);
 });
@@ -80,14 +80,14 @@ app.get("/urls/:id", (req, res) => {
   let input = req.params.id
   if (!urlDatabase.hasOwnProperty(input)) {
     let templateVars = {
-      username: req.cookies["username"],
+      userDetails: userDatabase[req.cookies["user_id"]],
       status: 404,
       message: "That TinyURL does not exist."
     };
     res.render("pages/error-page", templateVars)
   } else {
     let templateVars = {
-      username: req.cookies["username"],
+      userDetails: userDatabase[req.cookies["user_id"]],
       URLId: input,
       longURL: urlDatabase[req.params.id]
     };
@@ -98,7 +98,7 @@ app.get("/urls/:id", (req, res) => {
 // Registration page
 app.get("/register", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    userDetails: userDatabase[req.cookies["user_id"]],
   };
   res.render("pages/registration", templateVars);
 });
@@ -134,13 +134,20 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Username Login
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
+  let email = req.body.email;
+  let currentUser;
+  for (var userIds in userDatabase) {
+    if (email === userDatabase[userIds].email) {
+      currentUser = userIds;
+    }
+  };
+  res.cookie('user_id', currentUser);
   res.redirect(`http://localhost:8080/urls`);
 });
 
 // Username Logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect(`http://localhost:8080/urls`);
 });
 
@@ -154,11 +161,11 @@ app.post("/register", (req, res) => {
     if (email === userDatabase[userIds].email) {
       exists = true;
     }
-  }
+  };
 
   if (exists || !req.body.email || !req.body.password) {
     let templateVars = {
-      username: req.cookies["username"],
+      userDetails: userDatabase[req.cookies["user_id"]],
       status: 404,
       message: "Make sure you enter a valid email and password. Please try again."
     };
