@@ -1,9 +1,7 @@
 <!-- views/partials/_header.ejs -->
 <div style="margin: 20px;">
 <% if (!userDetails) { %>
-  <form action="/login" method="POST" style="display:inline;">
-    <label for="username">Email Address:</label>
-    <input id="username" type="text" name="username" placeholder="e.g. smith@example.com" style="width: 200px;">
+  <form action="/login" method="GET" style="display:inline;">
     <button type="submit">Login</button>
   </form>
   <form action="/register" method="GET" style="display:inline;">

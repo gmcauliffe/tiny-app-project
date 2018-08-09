@@ -75,6 +75,14 @@ app.get("/urls/new", (req, res) => {
   res.render("pages/urls_new", templateVars);
 });
 
+// Login page
+app.get('/login', function(req, res) {
+  let templateVars = {
+    userDetails: userDatabase[req.cookies["user_id"]],
+  };
+  res.render('pages/login', templateVars);
+});
+
 // single URL Id page
 app.get("/urls/:id", (req, res) => {
   let input = req.params.id
@@ -132,17 +140,30 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect(`http://localhost:8080/urls`);
 });
 
-// Username Login
+// Existing User Login
 app.post("/login", (req, res) => {
   let email = req.body.email;
-  let currentUser;
-  for (var userIds in userDatabase) {
-    if (email === userDatabase[userIds].email) {
-      currentUser = userIds;
+  let password = req.body.password;
+  let grantAccess = false;
+        console.log(grantAccess);
+  for (var i = 0; i < userDatabase.length; i++) {
+    if (email === userDatabase[i].email && password === userDatabase[i].password) {
+      grantAccess = true;
+      console.log(grantAccess);
     }
   };
-  res.cookie('user_id', currentUser);
-  res.redirect(`http://localhost:8080/urls`);
+
+  if (grantAccess) {
+    res.cookie('user_id', currentUser);
+    res.redirect(`http://localhost:8080/urls`);
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.cookies["user_id"]],
+      status: 403,
+      message: "Forbidden Access!"
+    };
+    res.render("pages/error-page", templateVars);
+  };
 });
 
 // Username Logout
@@ -151,7 +172,7 @@ app.post("/logout", (req, res) => {
   res.redirect(`http://localhost:8080/urls`);
 });
 
-// Register
+// New User Registration
 app.post("/register", (req, res) => {
   let password = req.body.password;
   let email = req.body.email;
