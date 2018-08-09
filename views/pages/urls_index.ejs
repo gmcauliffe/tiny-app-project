@@ -13,19 +13,32 @@
 
   <main style="font-size:20px; padding:75px;">
     <h1>URLS</h1>
-    <ul style="margin:50px;">
-
-      <% Object.keys(urls).forEach(function(URLId) { %>
-
-      <li>
-        <form method="POST" action=<%= `/urls/${URLId}/delete` %>>
-          <label for="URLDetails"><%= URLId %>  -->  <%= urls[URLId] %>  <a href=<%= `/urls/${URLId}` %>>Edit</a></label>
-          <button type="submit">Delete 🗑 </button>
-        </form>
-      </li>
-
-      <% }); %>
-    </ul>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">URL Id</th>
+      <th scope="col">URL</th>
+      <th scope="col">Edit</th>
+      <th scope="col">Delete</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% let i = 0 %>
+    <% Object.keys(urls).forEach(function(URLId) { %>
+    <% i++ %>
+    <form method="POST" action=<%= `/urls/${URLId}/delete` %>>
+      <tr>
+        <th scope="row"><%= i %></th>
+        <td><%= URLId %></td>
+        <td><%= urls[URLId] %></td>
+        <td><a href=<%= `/urls/${URLId}` %>>Edit</a></label></td>
+        <td><button type="submit">Delete 🗑 </button></td>
+      </tr>
+    </form>
+    <% }); %>
+  </tbody>
+</table>
   </main>
   <footer>
     <% include ../partials/_footer %>
