@@ -37,6 +37,14 @@ function generateRandomString() {
   return text;
 }
 
+function errorPage(req, res, status, message) {
+    let templateVars = {
+    userDetails: userDatabase[req.cookies["user_id"]],
+    "status": status,
+    "message": message
+    };
+    res.render("pages/error-page", templateVars);
+}
 
 // index page
 app.get('/', function(req, res) {
@@ -69,6 +77,7 @@ app.get("/urls", (req, res) => {
 
 // new URL page
 app.get("/urls/new", (req, res) => {
+//  if if (!userDetails) {
   let templateVars = {
     userDetails: userDatabase[req.cookies["user_id"]],
   };
@@ -87,12 +96,7 @@ app.get('/login', function(req, res) {
 app.get("/urls/:id", (req, res) => {
   let input = req.params.id
   if (!urlDatabase.hasOwnProperty(input)) {
-    let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
-      status: 404,
-      message: "That TinyURL does not exist."
-    };
-    res.render("pages/error-page", templateVars)
+    errorPage(req, res, 404, "That TinyURL does not exist.");
   } else {
     let templateVars = {
       userDetails: userDatabase[req.cookies["user_id"]],
@@ -157,12 +161,7 @@ app.post("/login", (req, res) => {
     res.cookie('user_id', currentUser);
     res.redirect(`http://localhost:8080/urls`);
   } else {
-    let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
-      status: 403,
-      message: "Forbidden Access!"
-    };
-    res.render("pages/error-page", templateVars);
+    errorPage(req, res, 404, "Forbidden Access!");
   };
 });
 
@@ -185,12 +184,7 @@ app.post("/register", (req, res) => {
   };
 
   if (exists || !req.body.email || !req.body.password) {
-    let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
-      status: 404,
-      message: "Make sure you enter a valid email and password. Please try again."
-    };
-    res.render("pages/error-page", templateVars);
+    errorPage(req, res, 404, "Make sure you enter a valid email and password. Please try again.");
   } else {
     var userId = generateRandomString();
     userDatabase[userId] = {
