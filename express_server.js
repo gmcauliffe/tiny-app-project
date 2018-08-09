@@ -13,7 +13,19 @@ app.set('view engine', 'ejs'); // set the view engine to ejs
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
-//  PostRequest: req.body.longURL
+};
+
+const userDatabase = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "barney1@example.com",
+    password: "purple-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "palmolive2@example.com",
+    password: "dishwasher-funk"
+  }
 };
 
 function generateRandomString() {
@@ -83,7 +95,7 @@ app.get("/urls/:id", (req, res) => {
   }
 });
 
-// Register
+// Registration page
 app.get("/register", (req, res) => {
   let templateVars = {
     username: req.cookies["username"]
@@ -129,6 +141,19 @@ app.post("/login", (req, res) => {
 // Username Logout
 app.post("/logout", (req, res) => {
   res.clearCookie('username');
+  res.redirect(`http://localhost:8080/urls`);
+});
+
+// Register
+app.post("/register", (req, res) => {
+  var userId = generateRandomString();
+  userDatabase[userId] = {
+      id: userId,
+      email: req.body.email,
+      password: req.body.password
+    };
+  res.cookie('user_id', userId);
+  console.log(userDatabase);
   res.redirect(`http://localhost:8080/urls`);
 });
 
