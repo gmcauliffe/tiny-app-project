@@ -25,18 +25,18 @@
   </thead>
   <tbody>
     <% let i = 0 %>
-    <% Object.keys(urls).forEach(function(URLId) { %>
+    <% for (var URLId in urlDb[userDetails.id]) { %>
     <% i++ %>
     <form method="POST" action=<%= `/urls/${URLId}/delete` %>>
       <tr>
         <th scope="row"><%= i %></th>
         <td><%= URLId %></td>
-        <td><%= urls[URLId] %></td>
+        <td><%= urlDb[userDetails.id][URLId] %></td>
         <td><a href=<%= `/urls/${URLId}` %>>Edit</a></label></td>
         <td><button type="submit">Delete 🗑 </button></td>
       </tr>
     </form>
-    <% }); %>
+    <% }; %>
   </tbody>
 </table>
   </main>

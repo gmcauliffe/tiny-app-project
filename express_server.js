@@ -11,20 +11,31 @@ app.use(cookieParser());
 app.set('view engine', 'ejs'); // set the view engine to ejs
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "BarN33": {
+    "b2xVn2": "http://www.lighthouselabs.ca",
+    "mnB4tu": "https://www.payphone-project.com/",
+    "9sD5xK": "http://www.google.com",
+    "kjhB58": " http://www.museumoffailure.se/"
+  },
+  "D15h3r": {
+    "gyh7Dj": "http://www.australiantelevision.net/",
+    "oku7Du": "https://tenplay.com.au/channel-ten/offspring",
+    "aD5hty": "http://www.abc.net.au/"
+  }
 };
 
 const userDatabase = {
-  "userRandomID": {
-    id: "userRandomID",
+  "BarN33": {
+    id: "BarN33",
     email: "barney1@example.com",
-    password: "purple-dinosaur"
+    password: "purple-dinosaur",
+    name: "Barney"
   },
- "user2RandomID": {
-    id: "user2RandomID",
+  "D15h3r": {
+    id: "D15h3r",
     email: "palmolive2@example.com",
-    password: "dishwasher-funk"
+    password: "dishwasher-funk",
+    name: "Squeaky"
   }
 };
 
@@ -37,6 +48,18 @@ function generateRandomString() {
   return text;
 }
 
+function errorPage(req, res, status, message) {
+    let templateVars = {
+    userDetails: userDatabase[req.cookies["user_id"]],
+    "status": status,
+    "message": message
+    };
+    res.render("pages/error-page", templateVars);
+}
+
+function urlsForUser(id) {
+  let userURLS =
+}
 
 // index page
 app.get('/', function(req, res) {
@@ -61,18 +84,27 @@ app.get("/urls.json", (req, res) => {
 
 // URLS index page
 app.get("/urls", (req, res) => {
-  let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
-    urls: urlDatabase};
-  res.render("pages/urls_index", templateVars);
+  if (!userDatabase[req.cookies["user_id"]]) {
+    errorPage(req, res, 404, "Forbidden Access!");
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.cookies["user_id"]],
+      userId: "user_id",
+      urlDb: urlDatabase};
+    res.render("pages/urls_index", templateVars);
+  }
 });
 
 // new URL page
 app.get("/urls/new", (req, res) => {
-  let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
+  if (!userDatabase[req.cookies["user_id"]]) {
+    errorPage(req, res, 404, "Forbidden Access!");
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.cookies["user_id"]],
+    };
+    res.render("pages/urls_new", templateVars);
   };
-  res.render("pages/urls_new", templateVars);
 });
 
 // Login page
@@ -85,19 +117,15 @@ app.get('/login', function(req, res) {
 
 // single URL Id page
 app.get("/urls/:id", (req, res) => {
-  let input = req.params.id
-  if (!urlDatabase.hasOwnProperty(input)) {
-    let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
-      status: 404,
-      message: "That TinyURL does not exist."
-    };
-    res.render("pages/error-page", templateVars)
+  let currentUser = req.cookies["user_id"];
+  let urlId = req.params.id
+  if (!currentUser || !urlDatabase[currentUser][urlId]) {
+    errorPage(req, res, 404, "Forbidden Access!");
   } else {
     let templateVars = {
       userDetails: userDatabase[req.cookies["user_id"]],
-      URLId: input,
-      longURL: urlDatabase[req.params.id]
+      URLId: urlId,
+      longURL: urlDatabase[currentUser][urlId]
     };
     res.render("pages/urls_show", templateVars);
   }
@@ -114,28 +142,46 @@ app.get("/register", (req, res) => {
 
 // Redirection
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  let short = req.params.shortURL;
+  let longURL = "";
+  for (var userId in urlDatabase) {
+    console.log(urlDatabase[userId]);
+    if (urlDatabase[userId][short]) {
+      longURL = urlDatabase[userId][short];
+      res.redirect(longURL);
+      return;
+    } else {
+    errorPage(req, res, 404, "The TinyURL you have entered does not exist. Please check the TinyURL and try again.");
+    }
+  }
 });
 
 // Create new URLId and add to database
 app.post("/urls", (req, res) => {
+  let currentUser = req.cookies["user_id"];
   let URLId = generateRandomString();
   let URL = req.body.longURL;
-  urlDatabase[URLId] = URL;
-  res.redirect(`http://localhost:8080/urls/${URLId}`);
+  urlDatabase[currentUser][URLId] = URL;
+  res.redirect(`/urls/${URLId}`);
 });
 
 // Update LongURL
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.updateURL;
-  res.redirect(`http://localhost:8080/urls`);
+  let currentUser = req.cookies["user_id"];
+  urlDatabase[currentUser][req.params.id] = req.body.updateURL;
+  res.redirect(`/urls`);
 });
 
 // Delete URLId
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect(`http://localhost:8080/urls`);
+  let currentUser = req.cookies["user_id"];
+  let urlId = req.params.id
+  if (!currentUser || !urlDatabase[currentUser][urlId]) {
+    errorPage(req, res, 404, "Forbidden Access!");
+  } else {
+    delete urlDatabase[currentUser][req.params.id];
+    res.redirect(`/urls`);
+  }
 });
 
 // Existing User Login
@@ -150,24 +196,18 @@ app.post("/login", (req, res) => {
       currentUser = userDatabase[ids]['id'];
     }
   };
-
   if (grantAccess) {
     res.cookie('user_id', currentUser);
-    res.redirect(`http://localhost:8080/urls`);
+    res.redirect(`/urls`);
   } else {
-    let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
-      status: 403,
-      message: "Forbidden Access!"
-    };
-    res.render("pages/error-page", templateVars);
+    errorPage(req, res, 404, "Forbidden Access!");
   };
 });
 
 // Username Logout
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect(`http://localhost:8080/urls`);
+  res.redirect(`/`);
 });
 
 // New User Registration
@@ -183,21 +223,18 @@ app.post("/register", (req, res) => {
   };
 
   if (exists || !req.body.email || !req.body.password) {
-    let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
-      status: 404,
-      message: "Make sure you enter a valid email and password. Please try again."
-    };
-    res.render("pages/error-page", templateVars);
+    errorPage(req, res, 404, "Make sure you enter a valid email and password. Please try again.");
   } else {
     var userId = generateRandomString();
     userDatabase[userId] = {
       id: userId,
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      name: req.body.displayName
     };
     res.cookie('user_id', userId);
-    res.redirect(`http://localhost:8080/urls`);
+    console.log(userDatabase);
+    res.redirect(`/urls`);
   };
 });
 
