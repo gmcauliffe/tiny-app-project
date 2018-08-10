@@ -11,20 +11,31 @@ app.use(cookieParser());
 app.set('view engine', 'ejs'); // set the view engine to ejs
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "BarN33": {
+    "b2xVn2": "http://www.lighthouselabs.ca",
+    "mnB4tu": "https://www.payphone-project.com/",
+    "9sD5xK": "http://www.google.com",
+    "kjhB58": " http://www.museumoffailure.se/"
+  },
+  "D15h3r": {
+    "gyh7Dj": "http://www.australiantelevision.net/",
+    "oku7Du": "https://tenplay.com.au/channel-ten/offspring",
+    "aD5hty": "http://www.abc.net.au/"
+  }
 };
 
 const userDatabase = {
-  "userRandomID": {
-    id: "userRandomID",
+  "BarN33": {
+    id: "BarN33",
     email: "barney1@example.com",
-    password: "purple-dinosaur"
+    password: "purple-dinosaur",
+    name: "Barney"
   },
- "user2RandomID": {
-    id: "user2RandomID",
+ "D15h3r": {
+    id: "D15h3r",
     email: "palmolive2@example.com",
-    password: "dishwasher-funk"
+    password: "dishwasher-funk",
+    name: "Squeaky"
   }
 };
 
@@ -69,10 +80,15 @@ app.get("/urls.json", (req, res) => {
 
 // URLS index page
 app.get("/urls", (req, res) => {
-  let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
-    urls: urlDatabase};
-  res.render("pages/urls_index", templateVars);
+  if (!userDatabase[req.cookies["user_id"]]) {
+    errorPage(req, res, 404, "Forbidden Access!");
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.cookies["user_id"]],
+      userId: "user_id",
+      urlDb: urlDatabase};
+    res.render("pages/urls_index", templateVars);
+  }
 });
 
 // new URL page
