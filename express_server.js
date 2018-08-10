@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const bcrypt = require('bcrypt');
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -19,8 +20,10 @@ const urlDatabase = {
   },
   "D15h3r": {
     "gyh7Dj": "http://www.australiantelevision.net/",
-    "oku7Du": "https://tenplay.com.au/channel-ten/offspring",
     "aD5hty": "http://www.abc.net.au/"
+  },
+  "Ck4bMY": {
+    "oku7Du": "https://tenplay.com.au/channel-ten/offspring"
   }
 };
 
@@ -28,15 +31,20 @@ const userDatabase = {
   "BarN33": {
     id: "BarN33",
     email: "barney1@example.com",
-    password: "purple-dinosaur",
+    password: "dino",
     name: "Barney"
   },
   "D15h3r": {
     id: "D15h3r",
     email: "palmolive2@example.com",
-    password: "dishwasher-funk",
+    password: "dishwasher",
     name: "Squeaky"
-  }
+  },
+  "Ck4bMY": {
+    id: 'Ck4bMY',
+    email: 'guyshop@icloud.com',
+    password: '$2b$10$secRBylSuUxNqgqJYq7K.uqnvo/1zPPoUkOTF.2jzJ.TQb4yoCxdC',
+    name: 'Guy' }
 };
 
 function generateRandomString() {
@@ -58,7 +66,7 @@ function errorPage(req, res, status, message) {
 }
 
 function urlsForUser(id) {
-  let userURLS =
+  let userURLS = id;
 }
 
 // index page
@@ -159,6 +167,7 @@ app.get("/u/:shortURL", (req, res) => {
 // Create new URLId and add to database
 app.post("/urls", (req, res) => {
   let currentUser = req.cookies["user_id"];
+  console.log("CurrentUser = " + currentUser);
   let URLId = generateRandomString();
   let URL = req.body.longURL;
   urlDatabase[currentUser][URLId] = URL;
@@ -186,16 +195,16 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // Existing User Login
 app.post("/login", (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
   let grantAccess = false;
   let currentUser = "";
+
   for (var ids in userDatabase) {
-    if (email === userDatabase[ids].email && password === userDatabase[ids].password) {
+    if (req.body.email === userDatabase[ids].email && bcrypt.compareSync(req.body.password, userDatabase[ids].password)) {
       grantAccess = true;
       currentUser = userDatabase[ids]['id'];
     }
   };
+
   if (grantAccess) {
     res.cookie('user_id', currentUser);
     res.redirect(`/urls`);
@@ -226,12 +235,14 @@ app.post("/register", (req, res) => {
     errorPage(req, res, 404, "Make sure you enter a valid email and password. Please try again.");
   } else {
     var userId = generateRandomString();
+    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
     userDatabase[userId] = {
       id: userId,
       email: req.body.email,
-      password: req.body.password,
+      password: hashedPassword,
       name: req.body.displayName
     };
+    urlDatabase[userId] = {};
     res.cookie('user_id', userId);
     console.log(userDatabase);
     res.redirect(`/urls`);
