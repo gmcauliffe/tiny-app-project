@@ -113,14 +113,15 @@ app.get('/login', function(req, res) {
 
 // single URL Id page
 app.get("/urls/:id", (req, res) => {
+  let currentUser = req.cookies["user_id"];
   let input = req.params.id
-  if (!urlDatabase.hasOwnProperty(input)) {
-    errorPage(req, res, 404, "That TinyURL does not exist.");
+  if (!currentUser || !urlDatabase[currentUser][input]) {
+    errorPage(req, res, 404, "Forbidden Access!");
   } else {
     let templateVars = {
       userDetails: userDatabase[req.cookies["user_id"]],
       URLId: input,
-      longURL: urlDatabase[req.params.id]
+      longURL: urlDatabase[currentUser][input]
     };
     res.render("pages/urls_show", templateVars);
   }
@@ -137,30 +138,58 @@ app.get("/register", (req, res) => {
 
 // Redirection
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  let shortURL = req.params.shortURL
+  let longURL = "";
+  for (var ids in urlDatabase) {
+    if (shortURL === urlDatabase[ids] {
+      grantAccess = true;
+      currentUser = userDatabase[ids]['id'];
+    }
+  };
+  if (grantAccess) {
+    res.cookie('user_id', currentUser);
+    res.redirect(`http://localhost:8080/urls`);
+  } else {
+    errorPage(req, res, 404, "Forbidden Access!");
+  };
+});
+
+  if (longURL === false) {
+    errorPage(req, res, 404, "That TinyURL does not exist.");
+  } else {
+    res.redirect(longURL);
+  }
+  errorPage(req, res, 404, "Forbidden Access!");
 });
 
 
 
 // Create new URLId and add to database
 app.post("/urls", (req, res) => {
+  let currentUser = req.cookies["user_id"];
   let URLId = generateRandomString();
   let URL = req.body.longURL;
-  urlDatabase[URLId] = URL;
+  urlDatabase[currentUser][URLId] = URL;
   res.redirect(`http://localhost:8080/urls/${URLId}`);
 });
 
 // Update LongURL
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.updateURL;
+  let currentUser = req.cookies["user_id"];
+  urlDatabase[currentUser][req.params.id] = req.body.updateURL;
   res.redirect(`http://localhost:8080/urls`);
 });
 
 // Delete URLId
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect(`http://localhost:8080/urls`);
+  let currentUser = req.cookies["user_id"];
+  let input = req.params.id
+  if (!currentUser || !urlDatabase[currentUser][input]) {
+    errorPage(req, res, 404, "Forbidden Access!");
+  } else {
+    delete urlDatabase[currentUser][req.params.id];
+    res.redirect(`http://localhost:8080/urls`);
+  }
 });
 
 // Existing User Login
@@ -186,7 +215,7 @@ app.post("/login", (req, res) => {
 // Username Logout
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect(`http://localhost:8080/urls`);
+  res.redirect(`http://localhost:8080/`);
 });
 
 // New User Registration
@@ -208,9 +237,11 @@ app.post("/register", (req, res) => {
     userDatabase[userId] = {
       id: userId,
       email: req.body.email,
-      password: req.body.password
+      password: req.body.password,
+      name: req.body.displayName
     };
     res.cookie('user_id', userId);
+    console.log(userDatabase);
     res.redirect(`http://localhost:8080/urls`);
   };
 });
