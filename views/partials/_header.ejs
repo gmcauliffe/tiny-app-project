@@ -1,19 +1,25 @@
 <!-- views/partials/_header.ejs -->
 <div style="margin: 20px;">
-<% if (!userDetails) { %>
-  <form action="/login" method="GET" style="display:inline;">
-    <button type="submit">Login</button>
-  </form>
-  <form action="/register" method="GET" style="display:inline;">
-    <button type="submit">Register</button>
-  </form>
-<% } else { %>
-  <form action="/logout" method="POST">
-    <label for="username"> <%= userDetails.email %> </label>
-    <button type="submit">Logout</button>
-  </form>
-<% } %>
+    <% if (!userDetails) { %>
+
+    <form action="/login" method="GET" style="display:inline;">
+      <button type="submit">Login</button>
+    </form>
+
+    <form action="/register" method="GET" style="display:inline;">
+      <button type="submit">Register</button>
+    </form>
+
+    <% } else { %>
+
+    <form action="/logout" method="POST">
+      <label for="username"> <%= userDetails.email %> </label>
+      <button type="submit">Logout</button>
+    </form>
+
+    <% } %>
 </div>
+
 <nav class="navbar navbar-default" role="navigation">
 <div class="container-fluid">
 
@@ -28,9 +34,6 @@
             <li><a href="/about">About</a></li>
             <li><a href="/urls">URLS Index</a></li>
             <li><a href="/urls/new">Get a TinyURL</a></li>
-            <li>
-
-            </li>
         </ul>
     </div>
 

@@ -6,9 +6,6 @@ const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-// const cookieParser = require("cookie-parser");
-// app.use(cookieParser());
-
 const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
@@ -97,11 +94,6 @@ app.get('/about', function(req, res) {
   };
   res.render('pages/about', templateVars);
 });
-
-// // URLS JSON Page
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
 
 // URLS index page
 app.get("/urls", (req, res) => {

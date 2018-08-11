@@ -7,46 +7,48 @@
 </head>
 <body>
 
-  <header>
-    <% include ../partials/_header %>
-  </header>
+<header>
+  <% include ../partials/_header %>
+</header>
 
-  <main style="font-size: 20px; padding: 75px;">
-    <h1>URLS</h1>
-    <table class="table table-striped">
-      <thead>
+<main style="font-size: 20px; padding: 75px;">
+
+  <h1>URLS</h1>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">URL Id</th>
+        <th scope="col">URL</th>
+        <th scope="col">Edit</th>
+        <th scope="col">Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% let i = 0 %>
+      <% for (var URLId in urlDb) { %>
+      <% i++ %>
+      <form method="POST" action=<%= `/urls/${URLId}/delete` %>>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">URL Id</th>
-          <th scope="col">URL</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Delete</th>
+          <th scope="row"><%= i %></th>
+          <td><%= URLId %></td>
+          <td><%= urlDb[URLId] %></td>
+          <td><a href=<%= `/urls/${URLId}` %>>Edit</a></label></td>
+          <td><button type="submit">Delete 🗑 </button></td>
         </tr>
-      </thead>
-      <tbody>
-        <% let i = 0 %>
-        <% for (var URLId in urlDb) { %>
-        <% i++ %>
-        <form method="POST" action=<%= `/urls/${URLId}/delete` %>>
-          <tr>
-            <th scope="row"><%= i %></th>
-            <td><%= URLId %></td>
-            <td><%= urlDb[URLId] %></td>
-            <td><a href=<%= `/urls/${URLId}` %>>Edit</a></label></td>
-            <td><button type="submit">Delete 🗑 </button></td>
-          </tr>
-        </form>
-        <% }; %>
-      </tbody>
-    </table>
+      </form>
+      <% }; %>
+    </tbody>
+  </table>
 
-    <form action="/urls/new" method="GET">
+  <form action="/urls/new" method="GET">
     <button type="submit" style="display:inline; object-position: absolute">Add a TinyURL</button>
-    </form>
+  </form>
 
-  </main>
-  <footer>
-    <% include ../partials/_footer %>
-  </footer>
+</main>
+<footer>
+  <% include ../partials/_footer %>
+</footer>
 </body>
 </html>
