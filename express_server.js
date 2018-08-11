@@ -6,8 +6,15 @@ const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
+// const cookieParser = require("cookie-parser");
+// app.use(cookieParser());
+
+const cookieSession = require('cookie-session');
+app.use(cookieSession({
+  name: 'session',
+  keys: ['franklin', 'lighthouse', 'coffee'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 app.set('view engine', 'ejs'); // set the view engine to ejs
 
@@ -58,10 +65,11 @@ function generateRandomString() {
 
 function errorPage(req, res, status, message) {
     let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
+    userDetails: userDatabase[req.session.user_id],
     "status": status,
     "message": message
     };
+    res.status(status);
     res.render("pages/error-page", templateVars);
 }
 
@@ -72,7 +80,7 @@ function urlsForUser(id) {
 // index page
 app.get('/', function(req, res) {
   let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
+    userDetails: userDatabase[req.session.user_id],
   };
   res.render('pages/index', templateVars);    // use res.render to load up an ejs view file
 });
@@ -80,7 +88,7 @@ app.get('/', function(req, res) {
 // about page
 app.get('/about', function(req, res) {
   let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
+    userDetails: userDatabase[req.session.user_id],
   };
   res.render('pages/about', templateVars);
 });
@@ -92,11 +100,12 @@ app.get("/urls.json", (req, res) => {
 
 // URLS index page
 app.get("/urls", (req, res) => {
-  if (!userDatabase[req.cookies["user_id"]]) {
+  console.log("req.sessions = " + req.session.user_id);
+  if (!userDatabase[req.session.user_id]) {
     errorPage(req, res, 404, "Forbidden Access!");
   } else {
     let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
+      userDetails: userDatabase[req.session.user_id],
       userId: "user_id",
       urlDb: urlDatabase};
     res.render("pages/urls_index", templateVars);
@@ -105,11 +114,11 @@ app.get("/urls", (req, res) => {
 
 // new URL page
 app.get("/urls/new", (req, res) => {
-  if (!userDatabase[req.cookies["user_id"]]) {
+  if (!userDatabase[req.session.user_id]) {
     errorPage(req, res, 404, "Forbidden Access!");
   } else {
     let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
+      userDetails: userDatabase[req.session.user_id],
     };
     res.render("pages/urls_new", templateVars);
   };
@@ -118,20 +127,20 @@ app.get("/urls/new", (req, res) => {
 // Login page
 app.get('/login', function(req, res) {
   let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
+    userDetails: userDatabase[req.session.user_id],
   };
   res.render('pages/login', templateVars);
 });
 
 // single URL Id page
 app.get("/urls/:id", (req, res) => {
-  let currentUser = req.cookies["user_id"];
+  let currentUser = req.session.user_id;
   let urlId = req.params.id
   if (!currentUser || !urlDatabase[currentUser][urlId]) {
     errorPage(req, res, 404, "Forbidden Access!");
   } else {
     let templateVars = {
-      userDetails: userDatabase[req.cookies["user_id"]],
+      userDetails: userDatabase[req.session.user_id],
       URLId: urlId,
       longURL: urlDatabase[currentUser][urlId]
     };
@@ -142,7 +151,7 @@ app.get("/urls/:id", (req, res) => {
 // Registration page
 app.get("/register", (req, res) => {
   let templateVars = {
-    userDetails: userDatabase[req.cookies["user_id"]],
+    userDetails: userDatabase[req.session.user_id],
   };
   res.render("pages/registration", templateVars);
 });
@@ -166,7 +175,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Create new URLId and add to database
 app.post("/urls", (req, res) => {
-  let currentUser = req.cookies["user_id"];
+  let currentUser = req.session.user_id;
   console.log("CurrentUser = " + currentUser);
   let URLId = generateRandomString();
   let URL = req.body.longURL;
@@ -176,14 +185,14 @@ app.post("/urls", (req, res) => {
 
 // Update LongURL
 app.post("/urls/:id", (req, res) => {
-  let currentUser = req.cookies["user_id"];
+  let currentUser = req.session.user_id;
   urlDatabase[currentUser][req.params.id] = req.body.updateURL;
   res.redirect(`/urls`);
 });
 
 // Delete URLId
 app.post("/urls/:id/delete", (req, res) => {
-  let currentUser = req.cookies["user_id"];
+  let currentUser = req.session.user_id;
   let urlId = req.params.id
   if (!currentUser || !urlDatabase[currentUser][urlId]) {
     errorPage(req, res, 404, "Forbidden Access!");
@@ -203,19 +212,21 @@ app.post("/login", (req, res) => {
       grantAccess = true;
       currentUser = userDatabase[ids]['id'];
     }
-  };
+  }
 
   if (grantAccess) {
-    res.cookie('user_id', currentUser);
+    req.session.user_id = currentUser;
+    console.log("Current user " + currentUser)
     res.redirect(`/urls`);
   } else {
+    console.log("Fail")
     errorPage(req, res, 404, "Forbidden Access!");
-  };
+  }
 });
 
 // Username Logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect(`/`);
 });
 
@@ -243,8 +254,7 @@ app.post("/register", (req, res) => {
       name: req.body.displayName
     };
     urlDatabase[userId] = {};
-    res.cookie('user_id', userId);
-    console.log(userDatabase);
+    req.session.user_id = userId;
     res.redirect(`/urls`);
   };
 });
