@@ -64,13 +64,13 @@ function generateRandomString() {
 }
 
 function errorPage(req, res, status, message) {
-    let templateVars = {
+  let templateVars = {
     userDetails: userDatabase[req.session.user_id],
     "status": status,
     "message": message
-    };
-    res.status(status);
-    res.render("pages/error-page", templateVars);
+  };
+  res.status(status);
+  res.render("pages/error-page", templateVars);
 }
 
 function urlsForUser(id) {
@@ -82,14 +82,14 @@ function urlsForUser(id) {
 app.get('/', function(req, res) {
   if (!userDatabase[req.session.user_id]) {
     let templateVars = {
-    userDetails: userDatabase[req.session.user_id],
+      userDetails: userDatabase[req.session.user_id],
     };
-    res.render('pages/index', templateVars);   // use res.render to load up an ejs view file
+    res.render('pages/index', templateVars);
   } else {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
     };
-    res.redirect('/urls', templateVars);   // use res.render to load up an ejs view file
+    res.redirect('/urls', templateVars);
   }
 });
 
@@ -101,15 +101,15 @@ app.get('/about', function(req, res) {
   res.render('pages/about', templateVars);
 });
 
-// URLS JSON Page
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
+// // URLS JSON Page
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
 
 // URLS index page
 app.get("/urls", (req, res) => {
   if (!userDatabase[req.session.user_id]) {
-    errorPage(req, res, 404, "Forbidden Access!");
+    errorPage(req, res, 403, "Forbidden Access!");
   } else {
     let urlList = urlsForUser(req.session.user_id);
     let templateVars = {
@@ -124,7 +124,10 @@ app.get("/urls", (req, res) => {
 // new URL page
 app.get("/urls/new", (req, res) => {
   if (!userDatabase[req.session.user_id]) {
-    errorPage(req, res, 404, "Forbidden Access!");
+    let templateVars = {
+      userDetails: userDatabase[req.session.user_id],
+    };
+    res.render('pages/index', templateVars);
   } else {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
@@ -135,10 +138,17 @@ app.get("/urls/new", (req, res) => {
 
 // Login page
 app.get('/login', function(req, res) {
-  let templateVars = {
-    userDetails: userDatabase[req.session.user_id],
-  };
-  res.render('pages/login', templateVars);
+  if (req.session.user_id) {
+    let templateVars = {
+      userDetails: userDatabase[req.session.user_id],
+    };
+    res.redirect('/urls', templateVars);
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.session.user_id],
+    };
+    res.render('pages/login', templateVars);
+  }
 });
 
 // single URL Id page
@@ -146,7 +156,7 @@ app.get("/urls/:id", (req, res) => {
   let currentUser = req.session.user_id;
   let urlId = req.params.id
   if (!currentUser || !urlDatabase[currentUser][urlId]) {
-    errorPage(req, res, 404, "Forbidden Access!");
+    errorPage(req, res, 403, "Forbidden Access!");
   } else {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
@@ -159,10 +169,17 @@ app.get("/urls/:id", (req, res) => {
 
 // Registration page
 app.get("/register", (req, res) => {
-  let templateVars = {
-    userDetails: userDatabase[req.session.user_id],
-  };
-  res.render("pages/registration", templateVars);
+  if (req.session.user_id) {
+    let templateVars = {
+      userDetails: userDatabase[req.session.user_id],
+    };
+    res.redirect('/urls', templateVars);
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.session.user_id],
+    };
+    res.render("pages/registration", templateVars);
+  }
 });
 
 
@@ -177,7 +194,7 @@ app.get("/u/:shortURL", (req, res) => {
       res.redirect(longURL);
       return;
     } else {
-    errorPage(req, res, 404, "The TinyURL you have entered does not exist. Please check the TinyURL and try again.");
+      errorPage(req, res, 404, "The TinyURL you have entered does not exist. Please check the TinyURL and try again.");
     }
   }
 });
@@ -185,7 +202,6 @@ app.get("/u/:shortURL", (req, res) => {
 // Create new URLId and add to database
 app.post("/urls", (req, res) => {
   let currentUser = req.session.user_id;
-  console.log("CurrentUser = " + currentUser);
   let URLId = generateRandomString();
   let URL = req.body.longURL;
   urlDatabase[currentUser][URLId] = URL;
@@ -195,8 +211,12 @@ app.post("/urls", (req, res) => {
 // Update LongURL
 app.post("/urls/:id", (req, res) => {
   let currentUser = req.session.user_id;
+  if (!currentUser || !urlDatabase[currentUser][urlId]) {
+    errorPage(req, res, 403, "Forbidden Access!");
+  } else {
   urlDatabase[currentUser][req.params.id] = req.body.updateURL;
   res.redirect(`/urls`);
+  }
 });
 
 // Delete URLId
@@ -204,7 +224,7 @@ app.post("/urls/:id/delete", (req, res) => {
   let currentUser = req.session.user_id;
   let urlId = req.params.id
   if (!currentUser || !urlDatabase[currentUser][urlId]) {
-    errorPage(req, res, 404, "Forbidden Access!");
+    errorPage(req, res, 403, "Forbidden Access!");
   } else {
     delete urlDatabase[currentUser][req.params.id];
     res.redirect(`/urls`);
@@ -222,12 +242,11 @@ app.post("/login", (req, res) => {
       currentUser = userDatabase[ids]['id'];
     }
   }
-
   if (grantAccess) {
     req.session.user_id = currentUser;
     res.redirect(`/urls`);
   } else {
-    errorPage(req, res, 404, "Forbidden Access!");
+    errorPage(req, res, 403, "The password or username you entered were incorrect or do not exist.\nPlease try again!");
   }
 });
 
@@ -249,8 +268,12 @@ app.post("/register", (req, res) => {
     }
   };
 
-  if (exists || !req.body.email || !req.body.password) {
-    errorPage(req, res, 404, "Make sure you enter a valid email and password. Please try again.");
+  if (exists) {
+    errorPage(req, res, 400, "Make sure you enter a valid email and password. Please try again.");
+  } else if (!req.body.email) {
+    errorPage(req, res, 400, "Make sure you enter a valid email. Please try again.");
+  } else if (!req.body.password) {
+    errorPage(req, res, 400, "Make sure you enter a valid password. Please try again.");
   } else {
     var userId = generateRandomString();
     const hashedPassword = bcrypt.hashSync(req.body.password, 10);
@@ -268,5 +291,5 @@ app.post("/register", (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log(`TinyApp listening on port ${PORT}!`);
+  console.log(`Guy's TinyApp Server listening on port ${PORT}!`);
 });
