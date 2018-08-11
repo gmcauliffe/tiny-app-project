@@ -38,13 +38,13 @@ const userDatabase = {
   "BarN33": {
     id: "BarN33",
     email: "barney1@example.com",
-    password: "dino",
+    password: '$2b$10$jt0mrbvcFbapK2cf74sTguytELnf4U71MOywdAVJ/1q8/4qUncaUW',
     name: "Barney"
   },
   "D15h3r": {
     id: "D15h3r",
     email: "palmolive2@example.com",
-    password: "dishwasher",
+    password: '$2b$10$OsxZen/W/BOLsxwnitABtu3EYlhHiYmc49BJdNAtpYV2KrUo1TTqC',
     name: "Squeaky"
   },
   "Ck4bMY": {
@@ -74,15 +74,23 @@ function errorPage(req, res, status, message) {
 }
 
 function urlsForUser(id) {
-  let userURLS = id;
+  let userURLS = urlDatabase[id];
+  return userURLS;
 }
 
 // index page
 app.get('/', function(req, res) {
-  let templateVars = {
+  if (!userDatabase[req.session.user_id]) {
+    let templateVars = {
     userDetails: userDatabase[req.session.user_id],
-  };
-  res.render('pages/index', templateVars);    // use res.render to load up an ejs view file
+    };
+    res.render('pages/index', templateVars);   // use res.render to load up an ejs view file
+  } else {
+    let templateVars = {
+      userDetails: userDatabase[req.session.user_id],
+    };
+    res.redirect('/urls', templateVars);   // use res.render to load up an ejs view file
+  }
 });
 
 // about page
@@ -100,14 +108,15 @@ app.get("/urls.json", (req, res) => {
 
 // URLS index page
 app.get("/urls", (req, res) => {
-  console.log("req.sessions = " + req.session.user_id);
   if (!userDatabase[req.session.user_id]) {
     errorPage(req, res, 404, "Forbidden Access!");
   } else {
+    let urlList = urlsForUser(req.session.user_id);
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
       userId: "user_id",
-      urlDb: urlDatabase};
+      urlDb: urlList
+    };
     res.render("pages/urls_index", templateVars);
   }
 });
@@ -121,7 +130,7 @@ app.get("/urls/new", (req, res) => {
       userDetails: userDatabase[req.session.user_id],
     };
     res.render("pages/urls_new", templateVars);
-  };
+  }
 });
 
 // Login page
@@ -216,10 +225,8 @@ app.post("/login", (req, res) => {
 
   if (grantAccess) {
     req.session.user_id = currentUser;
-    console.log("Current user " + currentUser)
     res.redirect(`/urls`);
   } else {
-    console.log("Fail")
     errorPage(req, res, 404, "Forbidden Access!");
   }
 });

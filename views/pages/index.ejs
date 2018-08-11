@@ -13,11 +13,23 @@
 
 <h1 style="margin:50px;">Guy's TinyApp</h1>
 
-<main style="font-size:20px; margin-left:50px;">
+<main style="font-size:18px; margin-left:50px;">
 
   <p>Do you want to fit more words into your tweets?</p>
   <p>Do you want to add URLs to your tweets but don't want to waste so many valuable characters?</p>
   <p>Well, look no further! Here at Guy's TinyApp we specialise in reducing long cumbersome URLs down to short 6 character alphanumeric IDs!</p>
+
+  <form action="/login" method="POST" style="margin-left: 50px;">
+    <label for="email" style="display:block; padding-top: 15px;">Enter Email: </label>
+    <input id="email" type="email" name="email" placeholder="e.g. smith@example.com" style="width: 300px;">
+    <label for="password" style="display:block; padding-top: 15px;">Password: </label>
+    <input id="password" type="password" name="password" placeholder="Enter password" style="width: 300px;">
+    <button type="submit" style="display:block; margin-top: 15px;">Submit</button>
+  </form>
+  <form action="/register" method="GET">
+    <label for="registration" style="margin-left: 40; font-size:16px"> Not yet a user? Create a free account! Click here: label>
+    <button type="submit"style="margin-top: 15px; font-size:16px;">Register</button>
+  </form>
   <img src="https://cdn.pixabay.com/photo/2014/04/03/11/53/twitter-312464_1280.png" alt="twitter bird" style="width:400px;">
 
 
