@@ -86,10 +86,7 @@ app.get('/', function(req, res) {
     };
     res.render('pages/index', templateVars);
   } else {
-    let templateVars = {
-      userDetails: userDatabase[req.session.user_id],
-    };
-    res.redirect('/urls', templateVars);
+    res.redirect('/urls');
   }
 });
 
@@ -109,7 +106,7 @@ app.get('/about', function(req, res) {
 // URLS index page
 app.get("/urls", (req, res) => {
   if (!userDatabase[req.session.user_id]) {
-    errorPage(req, res, 403, "Forbidden Access!");
+    errorPage(req, res, 403, "You must be logged in to see this page");
   } else {
     let urlList = urlsForUser(req.session.user_id);
     let templateVars = {
@@ -138,7 +135,7 @@ app.get("/urls/new", (req, res) => {
 
 // Login page
 app.get('/login', function(req, res) {
-  if (req.session.user_id) {
+  if (userDatabase[req.session.user_id]) {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
     };
@@ -169,11 +166,8 @@ app.get("/urls/:id", (req, res) => {
 
 // Registration page
 app.get("/register", (req, res) => {
-  if (req.session.user_id) {
-    let templateVars = {
-      userDetails: userDatabase[req.session.user_id],
-    };
-    res.redirect('/urls', templateVars);
+  if (userDatabase[req.session.user_id]) {
+    res.redirect('/urls');
   } else {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
@@ -211,6 +205,7 @@ app.post("/urls", (req, res) => {
 // Update LongURL
 app.post("/urls/:id", (req, res) => {
   let currentUser = req.session.user_id;
+  let urlId = req.params.id;
   if (!currentUser || !urlDatabase[currentUser][urlId]) {
     errorPage(req, res, 403, "Forbidden Access!");
   } else {
@@ -222,7 +217,7 @@ app.post("/urls/:id", (req, res) => {
 // Delete URLId
 app.post("/urls/:id/delete", (req, res) => {
   let currentUser = req.session.user_id;
-  let urlId = req.params.id
+  let urlId = req.params.id;
   if (!currentUser || !urlDatabase[currentUser][urlId]) {
     errorPage(req, res, 403, "Forbidden Access!");
   } else {
