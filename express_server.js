@@ -1,19 +1,19 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-const cookieSession = require('cookie-session');
+const cookieSession = require("cookie-session");
 app.use(cookieSession({
-  name: 'session',
-  keys: ['franklin', 'lighthouse', 'coffee'],
+  name: "session",
+  keys: ["franklin", "lighthouse", "coffee"],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
-app.set('view engine', 'ejs'); // set the view engine to ejs
+app.set("view engine", "ejs"); // set the view engine to ejs
 
 const urlDatabase = {
   "BarN33": {
@@ -35,20 +35,20 @@ const userDatabase = {
   "BarN33": {
     id: "BarN33",
     email: "barney1@example.com",
-    password: '$2b$10$jt0mrbvcFbapK2cf74sTguytELnf4U71MOywdAVJ/1q8/4qUncaUW',
+    password: "$2b$10$jt0mrbvcFbapK2cf74sTguytELnf4U71MOywdAVJ/1q8/4qUncaUW",
     name: "Barney"
   },
   "D15h3r": {
     id: "D15h3r",
     email: "palmolive2@example.com",
-    password: '$2b$10$OsxZen/W/BOLsxwnitABtu3EYlhHiYmc49BJdNAtpYV2KrUo1TTqC',
+    password: "$2b$10$OsxZen/W/BOLsxwnitABtu3EYlhHiYmc49BJdNAtpYV2KrUo1TTqC",
     name: "Squeaky"
   },
   "Ck4bMY": {
-    id: 'Ck4bMY',
-    email: 'guyshop@icloud.com',
-    password: '$2b$10$secRBylSuUxNqgqJYq7K.uqnvo/1zPPoUkOTF.2jzJ.TQb4yoCxdC',
-    name: 'Guy' }
+    id: "Ck4bMY",
+    email: "guy@example.com",
+    password: "$2b$10$secRBylSuUxNqgqJYq7K.uqnvo/1zPPoUkOTF.2jzJ.TQb4yoCxdC",
+    name: "Guy" }
 };
 
 function generateRandomString() {
@@ -56,7 +56,7 @@ function generateRandomString() {
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (var i = 0; i < 6; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
-  };
+  }
   return text;
 }
 
@@ -81,18 +81,18 @@ app.get('/', function(req, res) {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
     };
-    res.render('pages/index', templateVars);
+    res.render("pages/index", templateVars);
   } else {
-    res.redirect('/urls');
+    res.redirect("/urls");
   }
 });
 
 // about page
-app.get('/about', function(req, res) {
+app.get("/about", function(req, res) {
   let templateVars = {
     userDetails: userDatabase[req.session.user_id],
   };
-  res.render('pages/about', templateVars);
+  res.render("pages/about", templateVars);
 });
 
 // URLS index page
@@ -116,7 +116,7 @@ app.get("/urls/new", (req, res) => {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
     };
-    res.render('pages/index', templateVars);
+    res.render("pages/index", templateVars);
   } else {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
@@ -126,24 +126,24 @@ app.get("/urls/new", (req, res) => {
 });
 
 // Login page
-app.get('/login', function(req, res) {
+app.get("/login", function(req, res) {
   if (userDatabase[req.session.user_id]) {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
     };
-    res.redirect('/urls', templateVars);
+    res.redirect("/urls", templateVars);
   } else {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
     };
-    res.render('pages/login', templateVars);
+    res.render("pages/login", templateVars);
   }
 });
 
 // single URL Id page
 app.get("/urls/:id", (req, res) => {
   let currentUser = req.session.user_id;
-  let urlId = req.params.id
+  let urlId = req.params.id;
   if (!currentUser || !urlDatabase[currentUser][urlId]) {
     errorPage(req, res, 403, "Forbidden Access!");
   } else {
@@ -159,7 +159,7 @@ app.get("/urls/:id", (req, res) => {
 // Registration page
 app.get("/register", (req, res) => {
   if (userDatabase[req.session.user_id]) {
-    res.redirect('/urls');
+    res.redirect("/urls");
   } else {
     let templateVars = {
       userDetails: userDatabase[req.session.user_id],
@@ -169,20 +169,19 @@ app.get("/register", (req, res) => {
 });
 
 
-// Redirection
+// Redirection for TinyURLs
 app.get("/u/:shortURL", (req, res) => {
   let short = req.params.shortURL;
   let longURL = "";
   for (var userId in urlDatabase) {
-    console.log(urlDatabase[userId]);
     if (urlDatabase[userId][short]) {
       longURL = urlDatabase[userId][short];
       res.redirect(longURL);
       return;
-    } else {
-      errorPage(req, res, 404, "The TinyURL you have entered does not exist. Please check the TinyURL and try again.");
     }
   }
+  errorPage(req, res, 404, "The TinyURL you have entered does not exist. Please check the TinyURL and try again.");
+
 });
 
 // Create new URLId and add to database
@@ -202,7 +201,7 @@ app.post("/urls/:id", (req, res) => {
     errorPage(req, res, 403, "Forbidden Access!");
   } else {
   urlDatabase[currentUser][req.params.id] = req.body.updateURL;
-  res.redirect(`/urls`);
+  res.redirect("/urls");
   }
 });
 
@@ -214,7 +213,7 @@ app.post("/urls/:id/delete", (req, res) => {
     errorPage(req, res, 403, "Forbidden Access!");
   } else {
     delete urlDatabase[currentUser][req.params.id];
-    res.redirect(`/urls`);
+    res.redirect("/urls");
   }
 });
 
@@ -226,12 +225,12 @@ app.post("/login", (req, res) => {
   for (var ids in userDatabase) {
     if (req.body.email === userDatabase[ids].email && bcrypt.compareSync(req.body.password, userDatabase[ids].password)) {
       grantAccess = true;
-      currentUser = userDatabase[ids]['id'];
+      currentUser = userDatabase[ids].id;
     }
   }
   if (grantAccess) {
     req.session.user_id = currentUser;
-    res.redirect(`/urls`);
+    res.redirect("/urls");
   } else {
     errorPage(req, res, 403, "The password or username you entered were incorrect or do not exist.\nPlease try again!");
   }
@@ -240,7 +239,7 @@ app.post("/login", (req, res) => {
 // Username Logout
 app.post("/logout", (req, res) => {
   req.session = null;
-  res.redirect(`/`);
+  res.redirect("/");
 });
 
 // New User Registration
@@ -272,7 +271,7 @@ app.post("/register", (req, res) => {
     };
     urlDatabase[userId] = {};
     req.session.user_id = userId;
-    res.redirect(`/urls`);
+    res.redirect("/urls");
   };
 });
 
