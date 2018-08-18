@@ -2,30 +2,30 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <% include ../partials/_head %>
-</head>
-<body>
+  <head>
+    <% include ../partials/_head %>
+  </head>
+  <body>
 
-<header>
-  <% include ../partials/_header %>
-</header>
+    <header>
+      <% include ../partials/_header %>
+    </header>
 
-<h2 style="margin: 50px;">Registration</h2>
+    <h2 style="margin: 50px;">Registration</h2>
 
-<main style="padding-left: 100px;">
-  <form action="/register" method="POST" style="margin-left: 50px;">
-      <label for="displayName" style="display:block; padding-top: 15px;">Enter your name: </label>
-      <input id="displayName" type="text" name="displayName" placeholder="your name" style="width: 300px;">
-      <label for="email" style="display:block; padding-top: 15px;">Enter your email address: </label>
-      <input id="email" type="email" name="email" placeholder="e.g. smith@example.com" style="width: 300px;">
-      <label for="password" style="display:block; padding-top: 15px;">Choose a password: </label>
-      <input id="password" type="password" name="password" placeholder="Enter password" style="width: 300px;">
-      <button type="submit" style="display:block; margin-top: 15px;">Submit</button>
-  </form>
-</main>
-<footer>
-  <% include ../partials/_footer %>
-</footer>
-</body>
+    <main style="padding-left: 100px;">
+      <form action="/register" method="POST" style="margin-left: 50px;">
+          <label for="displayName" style="display:block; padding-top: 15px;">Enter your name: </label>
+          <input id="displayName" type="text" name="displayName" placeholder="your name" style="width: 300px  ;"  >
+          <label for="email" style="display:block; padding-top: 15px;">Enter your email address: </label>
+          <input id="email" type="email" name="email" placeholder="e.g. smith@example.com" style="width: 300  px  ;">
+          <label for="password" style="display:block; padding-top: 15px;">Choose a password: </label>
+          <input id="password" type="password" name="password" placeholder="Enter password" style="width: 300  px;">
+          <button type="submit" style="display:block; margin-top: 15px;">Submit</button>
+      </form>
+    </main>
+    <footer>
+      <% include ../partials/_footer %>
+    </footer>
+  </body>
 </html>
