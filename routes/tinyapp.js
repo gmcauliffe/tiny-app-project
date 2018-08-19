@@ -1,6 +1,15 @@
 const express = require("express");
 const tinyappRouter = new express.Router();
+const bcrypt = require("bcrypt");
 
+const cookieSession = require("cookie-session");
+app.use(cookieSession({
+  name: "session",
+  keys: ["franklin", "lighthouse", "coffee"],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
+
+// Database
 const urlDatabase = require("../data-files/url-database");
 const userDatabase = require("../data-files/user-database");
 
@@ -63,8 +72,12 @@ function addNewUser(password, email, displayName) {
   return userId;
 }
 
-function existingUser() {
-
+function existingUser(email) {
+  for (var userIds in userDatabase) {
+    if (email === userDatabase[userIds].email) {
+      return true;
+    }
+  }
 }
 
 
@@ -184,27 +197,46 @@ tinyappRouter
   })
   // New User Registration
   .post("/register", (req, res) => {
-    let user = false;
-    for (var userIds in userDatabase) {
-      if (req.body.email === userDatabase[userIds].email) {
-        exists = true;
-        return;
-      }
-    }
-    if (exists) {
+    let user = existingUser(req.body.email);
+    if (user) {
       errorPage(req, res, 400, "Make sure you enter a valid email and password. Please try again.");
     } else if (!req.body.email) {
       errorPage(req, res, 400, "Make sure you enter a valid email. Please try again.");
     } else if (!req.body.password) {
       errorPage(req, res, 400, "Make sure you enter a valid password. Please try again.");
     } else {
-      let userId = addNewUser (req.body.password, req.body.email, req.body.displayName);
+      let userId = addNewUser(req.body.password, req.body.email, req.body.displayName);
       req.session.user_id = userId;
       res.redirect("/urls");
-    };
+    }
+  })
+  // Redirection for TinyURLs
+  .get("/u/:shortURL", (req, res) => {
+    let short = req.params.shortURL;
+    let longURL = "";
+    for (var userId in urlDatabase) {
+      if (urlDatabase[userId][short]) {
+        longURL = urlDatabase[userId][short];
+        res.redirect(longURL);
+        return;
+      }
+    }
+    errorPage(req, res, 404, "The TinyURL you have entered does not exist. Please check the TinyURL and try again.");
+  })
+  // Delete URLId
+  .post("/urls/:id/delete", (req, res) => {
+    let owner = ownershipVerification(req.session.user_id, req.params.id);
+    if (!owner) {
+      errorPage(req, res, 403, "Forbidden Access!");
+    } else {
+      delete urlDatabase[currentUser][req.params.id];
+      res.redirect("/urls");
+    }
+  })
+  // Logout
+  .post("/logout", (req, res) => {
+    req.session = null;
+    res.redirect("/");
   });
-
-
-
 
 module.exports = tinyappRouter;
